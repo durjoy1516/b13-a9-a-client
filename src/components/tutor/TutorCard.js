@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 export default function TutorCard({ tutor }) {
   const { _id, name, image, subject, institution, hourlyRate, price, rating } = tutor || {};
+  
 
   return (
     <div className="bg-base-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between">
