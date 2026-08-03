@@ -59,14 +59,17 @@ export default function MyTutorsPage() {
     e.preventDefault();
     try {
       setUpdateLoading(true);
-      const res = await axiosPublic.put(`/tutors/${editingTutor._id}`, {
+
+      const updatedData = {
         name: editingTutor.name,
         subject: editingTutor.subject,
-        hourlyRate: Number(editingTutor.hourlyRate),
-        institution: editingTutor.institution,
-        image: editingTutor.image,
-        bio: editingTutor.bio,
-      });
+        hourlyRate: Number(editingTutor.hourlyRate || editingTutor.price || 0),
+        institution: editingTutor.institution || '',
+        image: editingTutor.image || '',
+        bio: editingTutor.bio || '',
+      };
+
+      const res = await axiosPublic.put(`/tutors/${editingTutor._id}`, updatedData);
 
       if (res.data.modifiedCount > 0 || res.data.success) {
         toast.success('Tutor profile updated successfully!');
@@ -144,7 +147,7 @@ export default function MyTutorsPage() {
                     </div>
                   </td>
                   <td className="font-medium text-emerald-600 dark:text-emerald-400">{item.subject}</td>
-                  <td className="font-bold text-indigo-600 dark:text-indigo-400">{item.hourlyRate || item.price} BDT</td>
+                  <td className="font-bold text-indigo-600 dark:text-indigo-400">{item.hourlyRate || item.price || 0} BDT</td>
                   <td>
                     <div className="flex gap-2">
                       <button
@@ -189,7 +192,7 @@ export default function MyTutorsPage() {
                 <input
                   type="text"
                   required
-                  value={editingTutor.name}
+                  value={editingTutor.name || ''}
                   onChange={(e) => setEditingTutor({ ...editingTutor, name: e.target.value })}
                   className="input input-bordered w-full rounded-xl focus:outline-indigo-600"
                 />
@@ -200,7 +203,7 @@ export default function MyTutorsPage() {
                 <input
                   type="text"
                   required
-                  value={editingTutor.subject}
+                  value={editingTutor.subject || ''}
                   onChange={(e) => setEditingTutor({ ...editingTutor, subject: e.target.value })}
                   className="input input-bordered w-full rounded-xl focus:outline-indigo-600"
                 />
@@ -211,7 +214,7 @@ export default function MyTutorsPage() {
                 <input
                   type="number"
                   required
-                  value={editingTutor.hourlyRate}
+                  value={editingTutor.hourlyRate ?? editingTutor.price ?? ''}
                   onChange={(e) => setEditingTutor({ ...editingTutor, hourlyRate: e.target.value })}
                   className="input input-bordered w-full rounded-xl focus:outline-indigo-600"
                 />
@@ -232,7 +235,7 @@ export default function MyTutorsPage() {
                 <input
                   type="url"
                   required
-                  value={editingTutor.image}
+                  value={editingTutor.image || ''}
                   onChange={(e) => setEditingTutor({ ...editingTutor, image: e.target.value })}
                   className="input input-bordered w-full rounded-xl focus:outline-indigo-600"
                 />
