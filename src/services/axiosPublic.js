@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosPublic = axios.create({
-  baseURL: 'http://localhost:5000', // পরবর্তীতে আপনার Vercel/Render backend URL দিবেন
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://findouttutors.vercel.app',
 });
 
 export default axiosPublic;

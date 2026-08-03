@@ -1,10 +1,9 @@
 import axios from 'axios';
 
 const axiosSecure = axios.create({
-  baseURL: 'http://localhost:5000',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://findouttutors.vercel.app',
 });
 
-// Request Interceptor: স্থানীয়ভাবে সংরক্ষিত JWT টোকেনটি প্রতিবার হেডার হিসেবে পাঠাবে
 axiosSecure.interceptors.request.use((config) => {
   const token = localStorage.getItem('access-token');
   if (token) {
