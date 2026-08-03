@@ -17,6 +17,9 @@ export default function AddTutorPage() {
     hourlyRate: '',
     image: '',
     experience: '',
+    totalSlot: 5, // ডিফল্ট স্লট সংখ্যা
+    teachingMode: 'Online',
+    sessionStartDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD
     bio: ''
   });
   const [submitting, setSubmitting] = useState(false);
@@ -50,7 +53,9 @@ export default function AddTutorPage() {
     const tutorData = {
       ...formData,
       hourlyRate: Number(formData.hourlyRate),
-      userEmail: user.email,
+      totalSlot: Number(formData.totalSlot),
+      email: user.email,       // <--- My Tutors পেজে ডাটা ম্যাকিংয়ের জন্য আবশ্যক
+      userEmail: user.email,   // ব্যাকএন্ড ব্যাকআপ
       rating: 5.0,
       createdAt: new Date().toISOString()
     };
@@ -58,7 +63,7 @@ export default function AddTutorPage() {
     try {
       setSubmitting(true);
       const res = await axiosPublic.post('/tutors', tutorData);
-      if (res.data.insertedId || res.data.success) {
+      if (res.data.insertedId || res.data.acknowledged) {
         toast.success('Tutor profile created successfully!');
         router.push('/my-tutors');
       }
@@ -89,6 +94,7 @@ export default function AddTutorPage() {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Name & Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Name</label>
@@ -114,6 +120,7 @@ export default function AddTutorPage() {
             </div>
           </div>
 
+          {/* Subject & Hourly Rate */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Subject / Category</label>
@@ -123,13 +130,13 @@ export default function AddTutorPage() {
                 required
                 value={formData.subject}
                 onChange={handleChange}
-                placeholder="e.g. Biology, Biochemistry, Physics"
+                placeholder="e.g. Mathematics, Physics, English"
                 className="input input-bordered w-full rounded-xl focus:outline-indigo-600"
               />
             </div>
 
             <div>
-              <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Hourly Rate (BDT)</label>
+              <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Hourly Rate (BDT / $)</label>
               <input
                 type="number"
                 name="hourlyRate"
@@ -142,6 +149,7 @@ export default function AddTutorPage() {
             </div>
           </div>
 
+          {/* Institution & Slots */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Institution / Qualification</label>
@@ -151,24 +159,55 @@ export default function AddTutorPage() {
                 required
                 value={formData.institution}
                 onChange={handleChange}
-                placeholder="e.g. DMC / Dhaka University"
+                placeholder="e.g. Dhaka University"
                 className="input input-bordered w-full rounded-xl focus:outline-indigo-600"
               />
             </div>
 
             <div>
-              <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Experience</label>
+              <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Available Slots</label>
               <input
-                type="text"
-                name="experience"
-                value={formData.experience}
+                type="number"
+                name="totalSlot"
+                required
+                value={formData.totalSlot}
                 onChange={handleChange}
-                placeholder="e.g. 3+ Years Experience"
+                placeholder="e.g. 5"
                 className="input input-bordered w-full rounded-xl focus:outline-indigo-600"
               />
             </div>
           </div>
 
+          {/* Teaching Mode & Start Date */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Teaching Mode</label>
+              <select
+                name="teachingMode"
+                value={formData.teachingMode}
+                onChange={handleChange}
+                className="select select-bordered w-full rounded-xl focus:outline-indigo-600"
+              >
+                <option value="Online">Online</option>
+                <option value="Offline">Offline</option>
+                <option value="Both">Both</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Session Start Date</label>
+              <input
+                type="date"
+                name="sessionStartDate"
+                required
+                value={formData.sessionStartDate}
+                onChange={handleChange}
+                className="input input-bordered w-full rounded-xl focus:outline-indigo-600"
+              />
+            </div>
+          </div>
+
+          {/* Image URL */}
           <div>
             <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Image URL</label>
             <input
@@ -182,6 +221,7 @@ export default function AddTutorPage() {
             />
           </div>
 
+          {/* Bio */}
           <div>
             <label className="label text-sm font-semibold text-slate-700 dark:text-slate-300">Bio / Description</label>
             <textarea
