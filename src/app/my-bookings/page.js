@@ -14,11 +14,13 @@ export default function MyBookingsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      toast.error('Please login to view your booked sessions');
-      router.push('/login');
-    } else if (user?.email) {
-      fetchMyBookings();
+    if (!authLoading) {
+      if (!user) {
+        toast.error('Please login to view your booked sessions');
+        router.push('/login');
+      } else if (user?.email) {
+        fetchMyBookings();
+      }
     }
   }, [user, authLoading, router]);
 
@@ -26,7 +28,11 @@ export default function MyBookingsPage() {
     try {
       setLoading(true);
       const res = await axiosPublic.get(`/bookings?email=${user.email}`);
-      setBookings(res.data);
+      if (Array.isArray(res.data)) {
+        setBookings(res.data);
+      } else {
+        setBookings([]);
+      }
     } catch (error) {
       console.error('Error fetching my bookings:', error);
       toast.error('Failed to load your booked sessions');
@@ -44,8 +50,9 @@ export default function MyBookingsPage() {
       const res = await axiosPublic.patch(`/bookings/${id}`, { status: 'cancelled' });
       if (res.data.modifiedCount > 0 || res.data.acknowledged) {
         toast.success('Booking cancelled successfully!');
-        // Locally update status to reflect without page reload
-        setBookings(bookings.map((b) => (b._id === id ? { ...b, status: 'cancelled' } : b)));
+        setBookings((prev) =>
+          prev.map((b) => (b._id === id ? { ...b, status: 'cancelled' } : b))
+        );
       }
     } catch (error) {
       console.error('Cancel booking error:', error);
@@ -89,7 +96,7 @@ export default function MyBookingsPage() {
           <table className="table w-full">
             <thead>
               <tr className="bg-base-200/50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300">
-                <th>Name</th>
+                <th>Student Name</th>
                 <th>Phone</th>
                 <th>Tutor Name</th>
                 <th>Email</th>
@@ -102,22 +109,22 @@ export default function MyBookingsPage() {
                 <tr key={item._id} className="border-b border-slate-200 dark:border-slate-700 hover:bg-base-200/30">
                   {/* Student Name */}
                   <td className="font-semibold text-slate-800 dark:text-white">
-                    {item.studentName || item.name || user?.displayName || 'Student'}
+                    {item.studentName || item.userName || item.name || user?.displayName || 'Student'}
                   </td>
 
                   {/* Phone */}
                   <td className="text-slate-600 dark:text-slate-300 text-sm">
-                    {item.phone || 'N/A'}
+                    {item.phone || item.userPhone || 'N/A'}
                   </td>
 
                   {/* Tutor Name */}
                   <td className="font-bold text-indigo-600 dark:text-indigo-400">
-                    {item.tutorName || 'N/A'}
+                    {item.tutorName || item.name || 'N/A'}
                   </td>
 
                   {/* Email */}
                   <td className="text-slate-600 dark:text-slate-300 text-sm">
-                    {item.studentEmail || item.userEmail || item.email}
+                    {item.studentEmail || item.userEmail || item.email || user?.email}
                   </td>
 
                   {/* Status Badge */}
