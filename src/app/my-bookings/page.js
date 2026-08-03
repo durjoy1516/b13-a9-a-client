@@ -25,7 +25,8 @@ export default function MyBookingsPage() {
   const fetchMyBookings = async () => {
     try {
       setLoading(true);
-      const res = await axiosPublic.get(`/my-bookings?email=${user.email}`);
+      // ✅ সঠিক API endpoint (/bookings)
+      const res = await axiosPublic.get(`/bookings?email=${user.email}`);
       setBookings(res.data);
     } catch (error) {
       console.error('Error fetching my bookings:', error);
