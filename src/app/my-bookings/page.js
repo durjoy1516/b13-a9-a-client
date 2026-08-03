@@ -25,7 +25,6 @@ export default function MyBookingsPage() {
   const fetchMyBookings = async () => {
     try {
       setLoading(true);
-      // ✅ সঠিক API endpoint (/bookings)
       const res = await axiosPublic.get(`/bookings?email=${user.email}`);
       setBookings(res.data);
     } catch (error) {
@@ -36,16 +35,17 @@ export default function MyBookingsPage() {
     }
   };
 
-  // Cancel / Delete Booking
+  // Update Status to Cancelled via PATCH
   const handleCancelBooking = async (id) => {
     const confirmCancel = window.confirm('Are you sure you want to cancel this booked session?');
     if (!confirmCancel) return;
 
     try {
-      const res = await axiosPublic.delete(`/bookings/${id}`);
-      if (res.data.deletedCount > 0 || res.data.success) {
+      const res = await axiosPublic.patch(`/bookings/${id}`, { status: 'cancelled' });
+      if (res.data.modifiedCount > 0 || res.data.acknowledged) {
         toast.success('Booking cancelled successfully!');
-        setBookings(bookings.filter((b) => b._id !== id));
+        // Locally update status to reflect without page reload
+        setBookings(bookings.map((b) => (b._id === id ? { ...b, status: 'cancelled' } : b)));
       }
     } catch (error) {
       console.error('Cancel booking error:', error);
@@ -62,7 +62,7 @@ export default function MyBookingsPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <div className="max-w-6xl mx-auto px-4 py-12 min-h-[70vh]">
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2">
           My Booked Sessions
@@ -73,65 +73,79 @@ export default function MyBookingsPage() {
       </div>
 
       {bookings.length === 0 ? (
-        <div className="text-center py-16 bg-base-100 dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700">
+        <div className="text-center py-16 bg-base-100 dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm">
           <p className="text-lg font-semibold text-slate-600 dark:text-slate-400 mb-4">
             You haven't booked any tutoring sessions yet.
           </p>
           <button
             onClick={() => router.push('/tutors')}
-            className="btn btn-indigo bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl"
+            className="btn bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl px-6 border-none"
           >
             Explore Tutors
           </button>
         </div>
       ) : (
-        <div className="overflow-x-auto bg-base-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <div className="overflow-x-auto bg-base-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-2">
           <table className="table w-full">
             <thead>
               <tr className="bg-base-200/50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300">
-                <th>#</th>
-                <th>Tutor Info</th>
-                <th>Subject</th>
-                <th>Scheduled Date & Time</th>
-                <th>Fee</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Tutor Name</th>
+                <th>Email</th>
+                <th className="text-center">Status</th>
+                <th className="text-center">Cancel</th>
               </tr>
             </thead>
             <tbody>
-              {bookings.map((item, index) => (
-                <tr key={item._id} className="border-b border-slate-200 dark:border-slate-700">
-                  <th>{index + 1}</th>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar">
-                        <div className="w-12 h-12 rounded-xl">
-                          <img src={item.tutorImage || 'https://via.placeholder.com/150'} alt={item.tutorName} />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="font-bold text-slate-800 dark:text-white">{item.tutorName}</div>
-                      </div>
-                    </div>
+              {bookings.map((item) => (
+                <tr key={item._id} className="border-b border-slate-200 dark:border-slate-700 hover:bg-base-200/30">
+                  {/* Student Name */}
+                  <td className="font-semibold text-slate-800 dark:text-white">
+                    {item.studentName || item.name || user?.displayName || 'Student'}
                   </td>
-                  <td className="font-medium text-emerald-600 dark:text-emerald-400">{item.subject}</td>
-                  <td className="text-slate-700 dark:text-slate-300">
-                    <div className="font-semibold">{item.bookingDate}</div>
-                    <div className="text-xs text-slate-500">{item.bookingTime}</div>
+
+                  {/* Phone */}
+                  <td className="text-slate-600 dark:text-slate-300 text-sm">
+                    {item.phone || 'N/A'}
                   </td>
-                  <td className="font-bold text-indigo-600 dark:text-indigo-400">{item.price} BDT</td>
-                  <td>
-                    <span className="badge badge-success bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-semibold border-none">
+
+                  {/* Tutor Name */}
+                  <td className="font-bold text-indigo-600 dark:text-indigo-400">
+                    {item.tutorName || 'N/A'}
+                  </td>
+
+                  {/* Email */}
+                  <td className="text-slate-600 dark:text-slate-300 text-sm">
+                    {item.studentEmail || item.userEmail || item.email}
+                  </td>
+
+                  {/* Status Badge */}
+                  <td className="text-center">
+                    <span
+                      className={`badge border-none font-semibold px-3 py-2 text-xs rounded-lg ${
+                        item.status === 'cancelled'
+                          ? 'bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-300'
+                          : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                      }`}
+                    >
                       {item.status || 'Booked'}
                     </span>
                   </td>
-                  <td>
-                    <button
-                      onClick={() => handleCancelBooking(item._id)}
-                      className="btn btn-sm btn-outline border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-lg"
-                    >
-                      Cancel Booking
-                    </button>
+
+                  {/* Cancel Button */}
+                  <td className="text-center">
+                    {item.status !== 'cancelled' ? (
+                      <button
+                        onClick={() => handleCancelBooking(item._id)}
+                        className="btn btn-xs btn-outline border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-md font-bold"
+                        title="Cancel Booking"
+                      >
+                        ✕
+                      </button>
+                    ) : (
+                      <span className="text-slate-400 text-xs">—</span>
+                    )}
                   </td>
                 </tr>
               ))}
