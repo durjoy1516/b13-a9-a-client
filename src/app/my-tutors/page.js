@@ -5,11 +5,16 @@ import { AuthContext } from '@/context/AuthProvider';
 import axiosPublic from '@/services/axiosPublic';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import TutorUpdateModal from '@/components/tutor/TutorUpdateModal'; // Import the Modal
 
 export default function MyTutorsPage() {
   const { user, loading: authLoading } = useContext(AuthContext);
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Modal State Control
+  const [selectedTutor, setSelectedTutor] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (user?.email) {
@@ -31,6 +36,11 @@ export default function MyTutorsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUpdateClick = (tutor) => {
+    setSelectedTutor(tutor);
+    setIsModalOpen(true);
   };
 
   const handleDeleteTutor = async (id) => {
@@ -115,12 +125,13 @@ export default function MyTutorsPage() {
               </div>
 
               <div className="flex gap-2 pt-4 border-t border-slate-100 dark:border-slate-700">
-                <Link
-                  href={`/update-tutor/${tutor._id}`}
+                {/* Fixed: Replaced <Link> with <button> */}
+                <button
+                  onClick={() => handleUpdateClick(tutor)}
                   className="btn btn-sm btn-outline btn-info flex-1 rounded-lg"
                 >
                   Update
-                </Link>
+                </button>
                 <button
                   onClick={() => handleDeleteTutor(tutor._id)}
                   className="btn btn-sm btn-outline btn-error flex-1 rounded-lg"
@@ -132,6 +143,14 @@ export default function MyTutorsPage() {
           ))}
         </div>
       )}
+
+      {/* Tutor Update Modal Integration */}
+      <TutorUpdateModal
+        tutor={selectedTutor}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onUpdateSuccess={fetchMyTutors}
+      />
     </div>
   );
 }
