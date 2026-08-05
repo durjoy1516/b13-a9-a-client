@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useContext } from 'react';
-// ✅ এখানে সঠিক ফাইল 'AuthProvider' দেওয়া হয়েছে
 import { AuthContext } from '@/context/AuthProvider'; 
 import ThemeToggle from '../theme/ThemeToggle';
 import toast from 'react-hot-toast';

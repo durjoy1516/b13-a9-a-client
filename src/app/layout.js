@@ -17,7 +17,7 @@ export const metadata = {
   title: 'MediQueue - Find Your Tutor',
   description: 'Book qualified tutors easily for medical and science education.',
   icons: {
-    icon: '/assets/icon.png', // Icon set done
+    icon: '/assets/icon.png?v=2',
   },
 };
 
