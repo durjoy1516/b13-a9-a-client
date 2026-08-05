@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { FaFacebookF, FaLinkedinIn, FaXTwitter } from 'react-icons/fa6';
 
 export default function Footer() {
   return (
@@ -34,20 +35,36 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Social Links with updated X logo */}
+        {/* Social Links using react-icons */}
         <div>
           <h3 className="text-lg font-semibold mb-3 text-white">Follow Us</h3>
-          <div className="flex space-x-4">
-            <a href="#" className="hover:text-indigo-400 transition-colors" aria-label="Facebook">
-              Facebook
+          <div className="flex space-x-4 items-center text-lg">
+            <a 
+              href="https://facebook.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-indigo-400 transition-colors p-2 bg-slate-800 rounded-full" 
+              aria-label="Facebook"
+            >
+              <FaFacebookF />
             </a>
-            <a href="#" className="hover:text-indigo-400 transition-colors" aria-label="LinkedIn">
-              LinkedIn
+            <a 
+              href="https://linkedin.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-indigo-400 transition-colors p-2 bg-slate-800 rounded-full" 
+              aria-label="LinkedIn"
+            >
+              <FaLinkedinIn />
             </a>
-            <a href="#" className="hover:text-indigo-400 transition-colors flex items-center gap-1" aria-label="X Logo">
-              <svg className="w-5 h-5 fill-current inline" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
+            <a 
+              href="https://x.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-indigo-400 transition-colors p-2 bg-slate-800 rounded-full" 
+              aria-label="X Logo"
+            >
+              <FaXTwitter />
             </a>
           </div>
         </div>
